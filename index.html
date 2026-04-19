@@ -60,188 +60,30 @@
 					</ul>
 				</section>
 				<section>
-					<h2>Langages possibles pour créer une API</h2>
-					<ul>
-						<li>PHP (Symfony, Laravel)</li>
-						<li>Python (Flask, Django)</li>
-						<li>JavaScript (Node.js, Express)</li>
-						<li>Ruby (Ruby on Rails)</li>
-						<li>Java (Spring Boot)</li>
-					</ul>
-				</section>
-				<section>
-					<h2>Exemple d'API RESTful en PHP</h2>
-					<pre><code class="php">&lt;?php
-// Headers pour permettre les requêtes cross-origin
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+					<h2>Exemple d'API avec Node.js et Express</h2>
+					<pre><code class="javascript">
+const express = require('express');
+const app = express();
+app.use(express.json());
 
-// Gérer les requêtes OPTIONS pour le pré-vol CORS, pré-vol veut dire vérifier les permissions avant d'envoyer la vraie requête
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+let products = [
+  { id: 1, title: 'Product 1', price: 19.99 },
+  { id: 2, title: 'Product 2', price: 29.99 }
+];
 
-// Connexion à la base de données
-$dsn = "mysql:host=localhost;dbname=api_db;charset=utf8mb4";
-$username = "root";
-$password = "";
-try {
-	$pdo = new PDO($dsn, $username, $password);
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-	http_response_code(500);
-	echo json_encode(["error" => "Database connection failed"]);
-	exit();
-}
+app.get('/products', (req, res) => {
+  res.json(products);
+});
 
-// Routes et logique de l'API
+app.get('/products/:id', (req, res) => {
+  const product = products.find(p => p.id === parseInt(req.params.id));
+  if (!product) return res.status(404).send('Product not found');
+  res.json(product);
+});
 
-// GET /products - Récupérer tous les produits
-if ($_SERVER['REQUEST_METHOD'] === 'GET' &amp;&amp; $_SERVER['REQUEST_URI'] === '/products') {
-	$stmt = $pdo->prepare("SELECT * FROM products");
-	$stmt->execute();
-	$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	$pdo = null; // Close the database connection
-	echo json_encode($products);
-
-// POST /products - Créer un nouveau produit
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' &amp;&amp; $_SERVER['REQUEST_URI'] === '/products') {
-	$data = json_decode(file_get_contents('php://input'), true);
-	if (isset($data['name']) &amp;&amp; isset($data['price'])) {
-		$stmt = $pdo->prepare("INSERT INTO products (name, price) VALUES (:name, :price)");
-		$stmt->bindParam(':name', $data['name']);
-		$stmt->bindParam(':price', $data['price']);
-		$stmt->execute();
-		$pdo = null; // Close the database connection
-		http_response_code(201);
-		echo json_encode(["message" => "Product created"]);
-	} else {
-		http_response_code(400);
-		echo json_encode(["error" => "Invalid input"]);
-	}
-// PUT /products/{id} - Mettre à jour un produit
-} elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' &amp;&amp; preg_match("#^/products/(\d+)$#", $_SERVER['REQUEST_URI'], $matches)) {
-	$productId = $matches[1];
-	$data = json_decode(file_get_contents('php://input'), true);
-	if (isset($data['name']) &amp;&amp; isset($data['price'])) {
-		$stmt = $pdo->prepare("UPDATE products SET name = :name, price = :price WHERE id = :id");
-		$stmt->bindParam(':name', $data['name']);
-		$stmt->bindParam(':price', $data['price']);
-		$stmt->bindParam(':id', $productId);
-		$stmt->execute();
-		$pdo = null; // Close the database connection
-		http_response_code(200);
-		echo json_encode(["message" => "Product updated"]);
-	} else {
-		http_response_code(400);
-		echo json_encode(["error" => "Invalid input"]);
-	}
-// DELETE /products/{id} - Supprimer un produit
-} elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE' &amp;&amp; preg_match("#^/products/(\d+)$#", $_SERVER['REQUEST_URI'], $matches)) {
-	$productId = $matches[1];
-	$stmt = $pdo->prepare("DELETE FROM products WHERE id = :id");
-	$stmt->bindParam(':id', $productId);
-	$stmt->execute();
-	$pdo = null; // Close the database connection
-	http_response_code(200);
-	echo json_encode(["message" => "Product deleted"]);
-} else {
-	http_response_code(404);
-	echo json_encode(["error" => "Not found"]);
-}
-?&gt;</code></pre>
-				</section>
-				<section>
-					<section>
-						<h2>Récupérer l'ID dans une URI</h2>
-					</section>
-					<section>
-						<h2>preg_match</h2>
-						<p>La fonction <code>preg_match</code> en PHP est utilisée pour effectuer des correspondances de motifs à l'aide d'expressions régulières.</p>
-					</section>
-					<section>
-						<pre><code class="php">preg_match(string $pattern, string $subject, array &$matches = null): int|false</code></pre>
-						<p>$pattern : Le motif à rechercher (expression régulière).</p>
-						<p>$subject : La chaîne dans laquelle rechercher.</p>
-						<p>$matches : Un tableau qui sera rempli avec les résultats de la correspondance.</p>
-					</section>
-					<section>
-						<p>Exemple :</p>
-<pre><code class="php">$url = "/products/123";
-if (preg_match("#^/products/(\d+)$#", $url, $matches)) {
-	$productId = $matches[1]; // Récupère l'ID du produit
-	echo "Product ID: " . $productId;
-} else {
-	echo "No match found.";
-}</code></pre>
-					</section>
-				</section>
-				<section>
-					<section>
-					
-						<h2>Headers côté serveur</h2>
-						<p>Les headers côté serveur sont des en-têtes HTTP envoyés par le serveur au client.</p>
-						<p>Exemple avec PHP</p>
-						<pre><code class="php">headers("Content-Type: application/json");
-headers("Access-Control-Allow-Origin: *");
-headers("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-headers("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-</code></pre>
-					</section>
-					<section>
-						<h2>Content-Type</h2>
-						<p>Indique le type de contenu de la réponse HTTP.</p>
-						<p>Exemples d'utilisation :</p>
-						<pre><code class="php">headers("Content-Type: application/json") // Indique que la réponse est au format JSON</code></pre>
-						<pre><code class="php">headers("Content-Type: text/html") // Indique que la réponse est au format HTML</code></pre>
-					</section>
-					<section>
-						<h2>Access-Control-Allow-Origin</h2>
-						<p>Indique les origines autorisées pour les requêtes cross-origin.</p>
-						<p>Exemples d'utilisation :</p>
-						<pre><code class="php">headers("Access-Control-Allow-Origin: *") // Autorise toutes les origines</code></pre>
-						<pre><code class="php">headers("Access-Control-Allow-Origin: https://example.com") // Autorise une origine spécifique</code></pre>
-					</section>
-					<section>
-						<h2>Access-Control-Allow-Methods</h2>
-						<p>Indique les méthodes HTTP autorisées pour les requêtes cross-origin.</p>
-						<p>Exemples d'utilisation :</p>
-						<pre><code class="php">headers("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS") // Spécifie les méthodes autorisées</code></pre>
-						<pre><code class="php">headers("Access-Control-Allow-Methods: GET") // Autorise uniquement les requêtes GET</code></pre>
-					</section>
-					<section>
-						<h2>Access-Control-Allow-Headers</h2>
-						<p>Indique les en-têtes HTTP autorisés pour les requêtes cross-origin.</p>
-						<p>Exemples d'utilisation :</p>
-						<pre><code class="php">headers("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With") // Spécifie les en-têtes autorisés</code></pre>
-						<pre><code class="php">headers("Access-Control-Allow-Headers: Content-Type") // Autorise uniquement l'en-tête Content-Type</code></pre>
-					</section>
-				</section>
-				<section>
-					<section>					
-						<h2>Headers côté client</h2>
-						<p>Les headers côté client sont des en-têtes HTTP envoyés par le client (navigateur ou application) au serveur.</p>
-					</section>
-					<section>
-						<p>Exemple avec curl</p>
-						<pre><code class="bash">curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer your_token" -d '{"key": "value"}' "https://api.example.com/data"</code></pre>
-					</section>
-					<section>
-						<p>Exemple avec la fonction fetch en JS</p>
-						<pre><code class="javascript">fetch("https://api.example.com/data", {
-	method: "POST",
-	headers: {
-		"Content-Type": "application/json",
-		"Authorization": "Bearer your_token"
-	},
-	body: JSON.stringify({ key: "value" })
-}).then(response =&gt; response.json())
-.then(data =&gt; console.log(data))
-.catch(error =&gt; console.error("Error:", error));</code></pre>
-					</section>
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});</code></pre>
 				</section>
 			</div>
 		</div>
