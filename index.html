@@ -60,6 +60,11 @@
 					</ul>
 				</section>
 				<section>
+					<h2>Express</h2>
+					<p>Express est un framework web pour Node.js qui simplifie la création d'applications web et d'APIs.</p>
+					<pre><code>npm install express</code></pre>
+				</section>
+				<section>
 					<h2>Exemple d'API avec Node.js et Express</h2>
 					<pre><code class="javascript">
 const express = require('express');
@@ -84,6 +89,12 @@ app.get('/products/:id', (req, res) => {
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });</code></pre>
+				</section>
+				<section>
+					<h2>ORM Sequelize</h2>
+					<p>Object-Relational Mapping (ORM) : Permet de travailler avec une base de données en utilisant des objets et des classes plutôt que des requêtes SQL brutes.</p>
+					<p>Sequelize : ORM pour Node.js qui supporte plusieurs bases de données (MySQL, PostgreSQL, SQLite, etc.)</p>
+					<pre><code>npm install sequelize</code></pre>
 				</section>
 				<section>
 					<h2>Migration de base de données avec Sequelize</h2>
@@ -182,6 +193,12 @@ sequelize.sync()
   });
 
 </code></pre>
+				</section>
+				<section>
+					<h2>JWT (JSON Web Tokens)</h2>
+					<p>JWT (JSON Web Tokens) : Un format standard pour représenter les informations échangées entre deux parties de manière sécurisée.</p>
+					<p>Dans le cadre de l'authentification, les JWT permettent de créer des tokens qui contiennent des informations sur l'utilisateur et peuvent être utilisés pour authentifier les requêtes suivantes.</p>
+					<pre><code>npm install jsonwebtoken</code></pre>
 				</section>
 				<section>
 					<h2>Authentification login avec JWT</h2>
