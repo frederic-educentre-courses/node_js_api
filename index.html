@@ -85,6 +85,104 @@ app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });</code></pre>
 				</section>
+				<section>
+					<h2>Migration de base de données avec Sequelize</h2>
+					<pre><code class="javascript">
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = new Sequelize('database', 'username', 'password', {
+  host: 'localhost',
+  dialect: 'mysql'
+});
+
+const Product = sequelize.define('Product', {
+  title: {
+	type: DataTypes.STRING,
+	allowNull: false
+	  },
+	    price: {
+	type: DataTypes.FLOAT,
+	allowNull: false
+	  }
+});
+
+sequelize.sync()
+  .then(() => {
+	console.log('Database & tables created!');
+	  })
+	    .catch(err => {
+	console.error('Unable to connect to the database:', err);
+	  });</code></pre>
+				</section>
+				<section>
+					<h2>API REST avec Sequelize et Express</h2>
+					<pre><code class="javascript">
+const express = require('express');
+const app = express();
+app.use(express.json());
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = new Sequelize('database', 'username', 'password', {
+  host: 'localhost',
+  dialect: 'mysql'
+});
+
+const Product = sequelize.define('Product', {
+  title: {
+	type: DataTypes.STRING,
+	allowNull: false
+	  },
+	    price: {
+	type: DataTypes.FLOAT,
+	allowNull: false
+	  }
+});
+
+app.get('/products', async (req, res) => {
+  const products = await Product.findAll();
+  res.json(products);
+});
+
+app.get('/products/:id', async (req, res) => {
+  const product = await Product.findByPk(req.params.id);
+  if (!product) return res.status(404).send('Product not found');
+  res.json(product);
+});
+
+app.post('/products', async (req, res) => {
+  const { title, price } = req.body;
+  const product = await Product.create({ title, price });
+  res.status(201).json(product);
+});
+
+app.put('/products/:id', async (req, res) => {
+  const { title, price } = req.body;
+  const product = await Product.findByPk(req.params.id);
+  if (!product) return res.status(404).send('Product not found');
+  product.title = title;
+  product.price = price;
+  await product.save();
+  res.json(product);
+});
+
+app.delete('/products/:id', async (req, res) => {
+  const product = await Product.findByPk(req.params.id);
+  if (!product) return res.status(404).send('Product not found');
+  await product.destroy();
+  res.status(204).send();
+});
+
+sequelize.sync()
+  .then(() => {
+	console.log('Database & tables created!');
+	app.listen(3000, () => {
+	  console.log('Server is running on port 3000');
+	});
+  })
+  .catch(err => {
+	console.error('Unable to connect to the database:', err);
+  });
+
+</code></pre>
+				</section>
 			</div>
 		</div>
 		<script src="dist/reveal.js"></script>
